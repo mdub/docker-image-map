@@ -1,0 +1,55 @@
+#! /usr/bin/env ruby
+
+require "clamp"
+require "docker"
+
+Excon.defaults[:ssl_verify_peer] = false
+
+class DotFormatter
+
+  def initialize(out)
+    @out = out
+  end
+
+  attr_reader :out
+
+  def start
+    out.puts %(digraph images {)
+  end
+
+  def image(id, parent, tags)
+    out.puts %(  #{label(id)} [shape=box style=filled fillcolor="#bbbbee"])
+    out.puts %(  #{label(id)} -> #{label(parent)}) if parent
+    tags.each do |tag|
+      out.puts %(  "#{tag}" -> #{label(id)})
+    end
+  end
+
+  def finish
+    out.puts "}"
+  end
+
+  def label(s)
+    '"' + s[0..11] + '"'
+  end
+
+end
+
+
+Clamp do
+
+  def execute
+    @formatter = DotFormatter.new($stdout)
+    @formatter.start
+    Docker::Image.all(:all => true).each do |image|
+      id = image.id
+      parent = image.info.fetch('ParentId')
+      parent = nil if parent == ""
+      tags = image.info.fetch('RepoTags') - ['<none>:<none>']
+      @formatter.image(id, parent, tags)
+    end
+    @formatter.finish
+  end
+
+end
+
