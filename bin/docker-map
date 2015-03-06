@@ -1,11 +1,13 @@
 #! /usr/bin/env ruby
 
-require "colorize"
 require "clamp"
 require "docker"
 require "docker_map/image_set"
+require "term/ansicolor"
 
 Excon.defaults[:ssl_verify_peer] = false
+
+C = Term::ANSIColor
 
 Clamp do
 
@@ -32,6 +34,7 @@ Clamp do
         info.parent = parent
         parent.children << info
       end
+      info.date = Time.at(image.info["Created"])
       image.info.fetch('RepoTags').each do |tag|
         info.tags << tag unless tag == '<none>:<none>'
       end
@@ -39,9 +42,9 @@ Clamp do
   end
 
   def display_image(image, prefix = "")
-    puts "#{prefix}#{image.id[0..11]}"
+    puts "#{prefix}#{image.id[0..11]} #{C.cyan}(#{image.date.strftime("%F")})#{C.reset}"
     image.tags.to_a.sort.each do |tag|
-      puts "#{prefix}  - #{tag.inspect}".colorize(:yellow)
+      puts "#{prefix}  #{C.yellow}- #{tag.inspect}#{C.reset}"
     end
     image.children.each do |child|
       display_image(child, prefix + "  ")

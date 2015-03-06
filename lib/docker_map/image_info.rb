@@ -9,6 +9,7 @@ module DockerMap
     end
 
     attr_reader :id
+    attr_accessor :date
     attr_accessor :parent
     attr_reader :children
     attr_reader :tags
