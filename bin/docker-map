@@ -13,6 +13,8 @@ C = Term::ANSIColor
 
 Clamp do
 
+  option ["-C", "--compact"], :flag, "compact output"
+
   def execute
     load_images
     image_set.roots.each do |root|
@@ -44,14 +46,40 @@ Clamp do
     end
   end
 
-  def display_image(image, prefix = "")
-    puts "#{prefix}#{image.id[0..11]} #{C.cyan}(#{image.date.strftime("%F")}, #{image.size})#{C.reset}"
-    image.tags.to_a.sort.each do |tag|
-      puts "#{prefix}  #{C.yellow}- #{tag.inspect}#{C.reset}"
+  def display_image(image, prefix = "", collapsed = 0)
+    if compact? && image.children.size == 1 && image.tags.empty?
+      display_image(image.children.first, prefix, collapsed + 1)
+    else
+      puts (prefix + image_line(image, collapsed))
+      prefix = prefix + "  " + (" " * collapsed)
+      image.tags.to_a.sort.each do |tag|
+        puts (prefix + tag_line(tag))
+      end
+      image.children.each do |child|
+        display_image(child, prefix)
+      end
     end
-    image.children.each do |child|
-      display_image(child, prefix + "  ")
+  end
+
+  def image_line(image, collapsed)
+    "".tap do |s|
+      if collapsed > 0
+        s << ("." * collapsed)
+      end
+      s << image.id[0..11]
+      s << " "
+      s << C.cyan
+      s << "("
+      s << image.date.strftime("%F")
+      s << ", "
+      s << image.size.to_s
+      s << ")"
+      s << C.reset
     end
+  end
+
+  def tag_line(tag)
+    "#{C.yellow}- #{tag.inspect}#{C.reset}"
   end
 
 end
