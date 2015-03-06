@@ -1,3 +1,5 @@
+require "set"
+
 module DockerMap
 
   class ImageInfo
