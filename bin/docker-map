@@ -35,6 +35,7 @@ Clamp do
         parent.children << info
       end
       info.date = Time.at(image.info["Created"])
+      info.size = (image.info["VirtualSize"].to_f / 1024 / 1024).round(1)
       image.info.fetch('RepoTags').each do |tag|
         info.tags << tag unless tag == '<none>:<none>'
       end
@@ -42,7 +43,7 @@ Clamp do
   end
 
   def display_image(image, prefix = "")
-    puts "#{prefix}#{image.id[0..11]} #{C.cyan}(#{image.date.strftime("%F")})#{C.reset}"
+    puts "#{prefix}#{image.id[0..11]} #{C.cyan}(#{image.date.strftime("%F")}, #{image.size})#{C.reset}"
     image.tags.to_a.sort.each do |tag|
       puts "#{prefix}  #{C.yellow}- #{tag.inspect}#{C.reset}"
     end
