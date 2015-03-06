@@ -1,54 +1,51 @@
 #! /usr/bin/env ruby
 
+require "colorize"
 require "clamp"
 require "docker"
+require "docker_map/image_set"
 
 Excon.defaults[:ssl_verify_peer] = false
-
-class DotFormatter
-
-  def initialize(out)
-    @out = out
-  end
-
-  attr_reader :out
-
-  def start
-    out.puts %(digraph images {)
-  end
-
-  def image(id, parent, tags)
-    out.puts %(  #{label(id)} [shape=box style=filled fillcolor="#bbbbee"])
-    out.puts %(  #{label(id)} -> #{label(parent)}) if parent
-    tags.each do |tag|
-      out.puts %(  "#{tag}" -> #{label(id)})
-    end
-  end
-
-  def finish
-    out.puts "}"
-  end
-
-  def label(s)
-    '"' + s[0..11] + '"'
-  end
-
-end
-
 
 Clamp do
 
   def execute
-    @formatter = DotFormatter.new($stdout)
-    @formatter.start
-    Docker::Image.all(:all => true).each do |image|
-      id = image.id
-      parent = image.info.fetch('ParentId')
-      parent = nil if parent == ""
-      tags = image.info.fetch('RepoTags') - ['<none>:<none>']
-      @formatter.image(id, parent, tags)
+    load_images
+    image_set.roots.each do |root|
+      display_image(root)
     end
-    @formatter.finish
+  end
+
+  private
+
+  def image_set
+    @image_set ||= DockerMap::ImageSet.new
+  end
+
+  def load_images
+    Docker::Image.all(:all => true).each do |image|
+      info = image_set[image.id]
+      parent_id = image.info.fetch('ParentId')
+      parent_id = nil if parent_id == ""
+      if parent_id
+        parent = image_set[parent_id]
+        info.parent = parent
+        parent.children << info
+      end
+      image.info.fetch('RepoTags').each do |tag|
+        info.tags << tag unless tag == '<none>:<none>'
+      end
+    end
+  end
+
+  def display_image(image, prefix = "")
+    puts "#{prefix}#{image.id[0..11]}"
+    image.tags.to_a.sort.each do |tag|
+      puts "#{prefix}  - #{tag.inspect}".colorize(:yellow)
+    end
+    image.children.each do |child|
+      display_image(child, prefix + "  ")
+    end
   end
 
 end
