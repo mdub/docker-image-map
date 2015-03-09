@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-require 'docker_map/image_set'
+require 'docker_image_map/image_set'
 
-RSpec.describe DockerMap::ImageSet do
+RSpec.describe DockerImageMap::ImageSet do
 
   subject(:image_set) { described_class.new }
 

@@ -1,6 +1,6 @@
 require "set"
 
-module DockerMap
+module DockerImageMap
 
   class ImageInfo
 

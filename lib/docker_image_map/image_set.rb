@@ -1,6 +1,6 @@
-require "docker_map/image_info"
+require "docker_image_map/image_info"
 
-module DockerMap
+module DockerImageMap
 
   class ImageSet
 
