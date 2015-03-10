@@ -1,31 +1,17 @@
-# Docker::Map
+# docker-image-map
 
-TODO: Write a gem description
+Visualize docker image history.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'docker-map'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install docker-map
+    gem install docker-image-map
 
 ## Usage
 
-TODO: Write usage instructions here
+    docker-image-map
+
+![Sample output](screenshot.png "Sample output")
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/docker-map/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+* It's on [GitHub](https://github.com/mdub/docker_image_map)
