@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'docker_image_map/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "docker_map"
+  spec.name          = "docker-image-map"
   spec.version       = DockerImageMap::VERSION
   spec.authors       = ["Mike Williams"]
   spec.email         = ["mdub@dogbiscuit.org"]
