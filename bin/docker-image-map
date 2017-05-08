@@ -40,7 +40,8 @@ Clamp do
       end
       info.date = Time.at(image.info["Created"])
       info.size = (image.info["VirtualSize"].to_f / 1024 / 1024).round(1)
-      image.info.fetch('RepoTags').each do |tag|
+      tags = image.info.fetch('RepoTags') || []
+      tags.each do |tag|
         info.tags << tag unless tag == '<none>:<none>'
       end
     end
@@ -83,4 +84,3 @@ Clamp do
   end
 
 end
-
